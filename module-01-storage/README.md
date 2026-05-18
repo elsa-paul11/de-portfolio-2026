@@ -1,6 +1,6 @@
 # Module 01 — Physical Storage
 
-[![Open In Colab](https://github.com/elsa-paul11/de-portfolio-2026/blob/main/module-01-storage/notebooks/m1_d1_s3_parquet_pipeline.ipynb)]
+[(https://github.com/elsa-paul11/de-portfolio-2026/blob/main/module-01-storage/notebooks/m1_d1_s3_parquet_pipeline.ipynb)]
 
 ## What I Built
 Partitioned Parquet ingestion pipeline on AWS S3 using PySpark.
