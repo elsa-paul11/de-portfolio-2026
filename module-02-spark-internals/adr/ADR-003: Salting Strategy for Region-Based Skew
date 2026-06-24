@@ -1,0 +1,33 @@
+# ADR-003: Salting Strategy for Region-Based Skew
+
+**Date:** 2026-06-24
+**Status:** Accepted
+
+## Context
+orders.region is heavily skewed — IN-SOUTH represents ~70% 
+of rows. GroupBy on region causes one partition to process 
+70% of data while others sit idle.
+
+## Decision
+Apply salting to region column before aggregation:
+1. Add random salt (0 to SALT_COUNT-1) to skewed key
+2. Partial aggregate on salted key
+3. Final aggregate after removing salt
+
+## SALT_COUNT Sizing
+Not based on number of distinct keys.
+Based on: (skewed key row count) ÷ (target rows per partition)
+Current: 70,000 IN-SOUTH rows, target ~10,000/partition
+SALT_COUNT = 7-8 for even distribution
+
+## Measured Impact
+At 100K rows (Colab, 2 cores): 24.6% improvement
+Expected at production scale (50+ workers): 80-90%+ improvement
+Benefit scales with cluster size — limited demonstration in Colab
+
+## Consequences
+✅ Prevents single-worker bottleneck on skewed keys
+✅ Scales with cluster size — bigger benefit at production scale
+❌ Adds complexity (two-phase aggregation instead of one)
+❌ Requires monitoring — skew distribution can shift over time
+⏳ Re-evaluate SALT_COUNT if regional distribution changes
